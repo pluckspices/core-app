@@ -8,4 +8,7 @@ app.get('/', (req, res) => {
     })
 });
 
-app.listen(4000, () => console.log('app listening on port 4000!'));
+let server = app.listen(process.env.PORT || 4000, () => {
+    let port = server.address().port;
+    console.log('app listening on port ', port);
+});
