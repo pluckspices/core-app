@@ -1,7 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const auctionManagerRoutes = require('./src/routes/auctionmanager/auctionManager.route');
+const auctionManagerRoutes = require("./src/routes/auctionmanager/auctionManager.route");
+const PlanterRoutes = require("./src/routes/usermanagement/planter");
+const TraderRoutes = require("./src/routes/usermanagement/trader");
+const DealerRoutes = require("./src/routes/usermanagement/dealer");
+const BidderRoutes = require("./src/routes/usermanagement/bidder");
 const app = express();
 
 //x-www-form-urlencoded <form>
@@ -18,7 +22,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/auctionmanager', auctionManagerRoutes);
+app.use("/auctionmanager", auctionManagerRoutes);
+app.use("/planter", PlanterRoutes);
+app.use("/trader", TraderRoutes);
+app.use("/dealer", DealerRoutes);
+app.use("/bidder", BidderRoutes);
+
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
