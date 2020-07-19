@@ -1,5 +1,5 @@
 const moment = require("moment");
-const Auction = require("../models/auction.model");
+const Auction = require("../../models/auctionmanager/auction.model");
 
 exports.createAuction = (req, res, next) => {
   console.log("create auction called");

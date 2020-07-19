@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const auctionManagerRoutes = require('./src/routes/auctionManager.route');
+const auctionManagerRoutes = require('./src/routes/auctionmanager/auctionManager.route');
 const app = express();
 
 //x-www-form-urlencoded <form>
