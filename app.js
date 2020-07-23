@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const auctionManagerRoutes = require("./src/routes/auctionmanager/auctionManager.route");
+const auctionManagerRoutes = require("./src/routes/auctionmanager/auctionManager");
 const PlanterRoutes = require("./src/routes/usermanagement/planter");
 const TraderRoutes = require("./src/routes/usermanagement/trader");
 const DealerRoutes = require("./src/routes/usermanagement/dealer");
