@@ -1,19 +1,43 @@
 const Planter = require("../../models/usermanagement/planter");
+const Code = require("../../moddleware/uniqueCode");
 
 exports.createPlanter = (req, res, next) => {
-  let name = req.body.name;
-  let crNumber = req.body.crNumber;
-  let phoneNumber = req.body.phoneNumber;
-  let address = req.body.address;
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
+  const crNumber = req.body.crNumber;
+  const phoneNumber = req.body.phoneNumber;
+  const address = req.body.address;
+  const agencyCode = "ABC";
+  const userType = "PL";
+  const planterURN = agencyCode + userType + Code.uniqueCode();
+  console.log("planterURN", planterURN);
 
-  Planter.create(name, crNumber, phoneNumber, address, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.send({
-        message:
-          err.message || "Some error occurred while creating the Planter.",
-      });
+  Planter.create(
+    planterURN,
+    firstName,
+    lastName,
+    crNumber,
+    phoneNumber,
+    address,
+    (err, data) => {
+      if (err) {
+        res.statusCode = 500;
+        res.send({
+          message:
+            err.message || "Some error occurred while creating the Planter.",
+        });
+      }
+      res.send(data);
     }
-    res.send(data);
+  );
+};
+
+exports.planterDetails = (req, res, next) => {
+  Planter.getAll((err, data) => {
+    if (err)
+      res.status(500).send({
+        message: "Some error occurred while retrieving Planter details.",
+      });
+    else res.send(data);
   });
 };
