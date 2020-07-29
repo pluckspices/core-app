@@ -7,9 +7,17 @@ const Planter = (planter) => {
   this.address = this.address;
 };
 
-Planter.create = (name, crNumber, phoneNumber, address, result) => {
+Planter.create = (
+  planterURN,
+  firstName,
+  lastName,
+  crNumber,
+  phoneNumber,
+  address,
+  result
+) => {
   sql.query(
-    `INSERT INTO users_planter (name, cr_no, phonenumber, address) VALUES ( '${name}', '${crNumber}', '${phoneNumber}', '${address}');`,
+    `INSERT INTO users_planter (planter_urn, first_name, last_name, cr_no, phone_number, address) VALUES ( '${planterURN}', '${firstName}', '${lastName}', '${crNumber}', '${phoneNumber}', '${address}');`,
     (err) => {
       if (err) {
         console.log("error: ", err);
@@ -17,6 +25,25 @@ Planter.create = (name, crNumber, phoneNumber, address, result) => {
         return;
       }
       result(null, { crNumber });
+    }
+  );
+};
+
+Planter.getAll = (result) => {
+  sql.query(
+    `SELECT planter_urn as planterURN,
+    first_name as firstName,
+    last_name as lastName,
+    cr_no as crNumber
+    from users_planter`,
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+      console.log("planters: ", res);
+      result(null, res);
     }
   );
 };
