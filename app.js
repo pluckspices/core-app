@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
+const AuthRoutes = require("./src/routes/auth");
 const auctionManagerRoutes = require("./src/routes/auctionmanager/auctionManager");
 const PlanterRoutes = require("./src/routes/usermanagement/planter");
 const TraderRoutes = require("./src/routes/usermanagement/trader");
@@ -8,8 +9,6 @@ const DealerRoutes = require("./src/routes/usermanagement/dealer");
 const BidderRoutes = require("./src/routes/usermanagement/bidder");
 const app = express();
 
-//x-www-form-urlencoded <form>
-// app.use(bodyParser.urlencoded({ extended: false }));
 // application/json
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -22,6 +21,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/auth", AuthRoutes);
 app.use("/auctionmanager", auctionManagerRoutes);
 app.use("/planter", PlanterRoutes);
 app.use("/trader", TraderRoutes);
