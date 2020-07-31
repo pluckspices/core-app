@@ -46,7 +46,6 @@ Planter.getAll = (result) => {
       result(null, res);
     }
   );
-  sql.end();
 };
 
 Planter.delete = (planterURN, result) => {
