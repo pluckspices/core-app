@@ -1,9 +1,10 @@
-const Auction = require("../../models/auctionmanager/auctionManager");
+const Auction = require("../../models/auction");
 
 exports.createAuction = (req, res, next) => {
   let auctionDate = req.body.auctionDate;
   let auctionSession = req.body.auctionSession;
-  let financialYear = "";
+  let financialYear;
+  let auctionSessionCode;
   const dateofAuction = new Date(auctionDate);
   let dayOfAuction = String(dateofAuction.getDate());
   let monthOfAuction = String(dateofAuction.getMonth() + 1);
@@ -13,7 +14,6 @@ exports.createAuction = (req, res, next) => {
   if (monthOfAuction.length === 1) {
     monthOfAuction = `0${monthOfAuction}`;
   }
-
   if (dateofAuction.getMonth() + 1 <= 3) {
     let previousYear = String(dateofAuction.getFullYear() - 1);
     let currentYear = String(dateofAuction.getFullYear());
@@ -23,31 +23,35 @@ exports.createAuction = (req, res, next) => {
     let nextYear = String(dateofAuction.getFullYear() + 1);
     financialYear = currentYear.substr(2, 2) + "" + nextYear.substr(2, 2);
   }
-  let auctionNumber = `ABC${financialYear}DM${dayOfAuction}${monthOfAuction}S${auctionSession}`;
-  Auction.create(
-    auctionNumber,
-    auctionDate,
-    auctionSession,
-    11,
-    (err, data) => {
-      if (err) {
-        if (err.kind === "DUP_ENTRY") {
-          res.status(409).send({
-            message: "Auction already exists",
-            auctionId: auctionNumber,
-          });
-        } else {
-          res.status(500).send({
-            message: "Some error occurred while creating the Auction",
-          });
-        }
-      } else res.send(data);
-    }
-  );
+  switch (auctionSession) {
+    case 91:
+      auctionSessionCode = "MR";
+      break;
+    case 92:
+      auctionSessionCode = "PL";
+      break;
+    default:
+      break;
+  }
+  let auctionNumber = `ABC${financialYear}${auctionSessionCode}${dayOfAuction}${monthOfAuction}`;
+  Auction.create(auctionNumber, auctionDate, auctionSession, 11, (err, data) => {
+    if (err) {
+      if (err.kind === "DUP_ENTRY") {
+        res.status(409).send({
+          message: "Auction already exists",
+          auctionId: auctionNumber,
+        });
+      } else {
+        res.status(500).send({
+          message: "Some error occurred while creating the Auction",
+        });
+      }
+    } else res.send(data);
+  });
 };
 
-exports.auctionHoldings = (req, res) => {
-  Auction.getHoldings((err, data) => {
+exports.auctionHolding = (req, res) => {
+  Auction.findByStatusActive((err, data) => {
     if (err)
       res.status(500).send({
         message: "Some error occurred while retrieving Auction.",
@@ -56,8 +60,9 @@ exports.auctionHoldings = (req, res) => {
   });
 };
 
+
 exports.auctionHistory = (req, res) => {
-  Auction.getHistory((err, data) => {
+  Auction.findByStatusClosed((err, data) => {
     if (err)
       res.status(500).send({
         message: "Some error occurred while retrieving Auction.",
@@ -67,7 +72,7 @@ exports.auctionHistory = (req, res) => {
 };
 
 exports.deleteAuction = (req, res) => {
-  const auctionId = String(req.body.auctionId);
+  const auctionId = String(req.params.auctionId);
   Auction.delete(auctionId, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
@@ -90,11 +95,10 @@ exports.deleteAuction = (req, res) => {
 };
 
 exports.updateAuction = (req, res) => {
-  const auctionId = String(req.body.auctionId);
+  const auctionId = String(req.params.auctionId);
   const auctionStatus = req.body.auctionStatus;
   const auctionDate = req.body.auctionDate;
   const auctionSession = req.body.auctionSession;
-  console.log("updateAuction called", req.body)
   Auction.update(
     auctionId,
     auctionDate,

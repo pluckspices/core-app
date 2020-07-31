@@ -2,9 +2,15 @@ const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 
-const ApplicationUser = require("../../models/auth");
+const OwnedUser = require("../../models/user");
 
 exports.userSignUp = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).send({
+      message: `Please check the fields!`,
+    });
+  }
   const userEmail = req.body.userEmail;
   const userPassword = req.body.userPassword;
   if (!userEmail && !userPassword) {
@@ -13,7 +19,7 @@ exports.userSignUp = (req, res, next) => {
     });
   } else {
     bcrypt.hash(userPassword, 12).then((hashpassword) => {
-      ApplicationUser.create(userEmail, hashpassword, (err, data) => {
+      OwnedUser.create(userEmail, hashpassword, (err, data) => {
         if (err) {
           if (err.kind === "DUP_ENTRY") {
             res.status(409).send({
@@ -31,7 +37,7 @@ exports.userSignUp = (req, res, next) => {
   }
 };
 
-exports.userSignIn = (req, res, next) => {
+exports.userLogin = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).send({
@@ -45,7 +51,7 @@ exports.userSignIn = (req, res, next) => {
       message: "Username and Password are required!",
     });
   } else {
-    ApplicationUser.login(userEmail, (err, data) => {
+    OwnedUser.findByEmail(userEmail, (err, data) => {
       if (err) {
         if (err.kind === "NO_USER") {
           res.status(401).send({
@@ -65,10 +71,10 @@ exports.userSignIn = (req, res, next) => {
         } else {
           const token = jwt.sign(
             {
-              email: userEmail,
+              userEmail: userEmail,
             },
             "nithin",
-            { expiresIn: "1h" }
+            { expiresIn: "30m" }
           );
           res.send({
             token: token,

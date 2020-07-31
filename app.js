@@ -1,12 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
-const AuthRoutes = require("./src/routes/auth");
-const auctionManagerRoutes = require("./src/routes/auctionmanager/auctionManager");
-const PlanterRoutes = require("./src/routes/usermanagement/planter");
-const TraderRoutes = require("./src/routes/usermanagement/trader");
-const DealerRoutes = require("./src/routes/usermanagement/dealer");
-const BidderRoutes = require("./src/routes/usermanagement/bidder");
+const V1Routes = require("./src/routes");
 const app = express();
 
 // application/json
@@ -21,13 +15,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/auth", AuthRoutes);
-app.use("/auctionmanager", auctionManagerRoutes);
-app.use("/planter", PlanterRoutes);
-app.use("/trader", TraderRoutes);
-app.use("/dealer", DealerRoutes);
-app.use("/bidder", BidderRoutes);
-
+app.use("/v1", V1Routes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

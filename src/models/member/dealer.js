@@ -1,4 +1,4 @@
-const sql = require("../db.js");
+const sql = require("../../middleware/db.js");
 
 const Dealer = (trader) => {
   this.dealerName = trader.name;
