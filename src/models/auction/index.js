@@ -1,4 +1,4 @@
-const sql = require("../db.js");
+const sql = require("../../middleware/db.js");
 
 // constructor
 const Auction = (auction) => {
@@ -26,7 +26,7 @@ Auction.create = (auctionId, auctionDate, session, status, result) => {
   );
 };
 
-Auction.getHoldings = (result) => {
+Auction.findByStatusActive = (result) => {
   sql.query(
     `SELECT auction_id as auctionId,
      auction_date as auctionDate,
@@ -45,7 +45,7 @@ Auction.getHoldings = (result) => {
   );
 };
 
-Auction.getHistory = (result) => {
+Auction.findByStatusClosed = (result) => {
   sql.query(
     `SELECT auction_id as auctionId,
      auction_date as auctionDate,
@@ -78,7 +78,6 @@ Auction.delete = (auctionId, result) => {
         result({ kind: "not_found" }, null);
         return;
       }
-      console.log("deleted auction with id: ", auctionId);
       result(null, res);
     }
   );

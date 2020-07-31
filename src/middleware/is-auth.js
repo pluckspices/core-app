@@ -11,16 +11,14 @@ module.exports = (req, res, next) => {
   let decodedToken;
   try {
     decodedToken = jwt.verify(token, "nithin");
+    req.userEmail = decodedToken.userEmail;
   } catch (err) {
-    res.status(500).send({
-      message: "Server error!",
-    });
+    console.log(err);
   }
   if (!decodedToken) {
     res.status(401).send({
       message: "Not authenticated!",
     });
   }
-  req.userEmail = decodedToken.email;
   next();
 };

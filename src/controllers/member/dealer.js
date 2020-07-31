@@ -1,4 +1,4 @@
-const Dealer = require("../../models/usermanagement/dealer");
+const Dealer = require("../../models/member/dealer");
 
 exports.createDealer = (req, res, next) => {
   let dealerName = req.body.dealerName;

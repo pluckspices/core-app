@@ -1,4 +1,4 @@
-const Bidder = require("../../models/usermanagement/bidder");
+const Bidder = require("../../models/member/bidder");
 
 exports.createBidder = (req, res, next) => {
   let bidderName = req.body.bidderName;
