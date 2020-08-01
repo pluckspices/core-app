@@ -14,6 +14,8 @@ router.delete("/planter/:planterURN", PlanterController.deletePlanter);
 
 // Bidder
 router.post("/bidder", BidderController.createBidder);
+router.get("/bidders", BidderController.bidderDetails);
+router.delete("/bidder/:bidderCode", BidderController.deleteBidder);
 
 //Trader
 router.post("/create", TraderController.createTrader);
