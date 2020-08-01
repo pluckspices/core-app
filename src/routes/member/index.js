@@ -13,7 +13,7 @@ router.put("/planter/:planterURN", PlanterController.updatePlanter);
 router.delete("/planter/:planterURN", PlanterController.deletePlanter);
 
 // Bidder
-router.post("/create", BidderController.createBidder);
+router.post("/bidder", BidderController.createBidder);
 
 //Trader
 router.post("/create", TraderController.createTrader);

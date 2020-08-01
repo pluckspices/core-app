@@ -34,7 +34,9 @@ Planter.getAll = (result) => {
     `SELECT planter_urn as planterURN,
     first_name as firstName,
     last_name as lastName,
-    cr_no as crNumber
+    cr_no as crNumber,
+    phone_number as phoneNumber,
+    address as address
     from users_planter`,
     (err, res) => {
       if (err) {

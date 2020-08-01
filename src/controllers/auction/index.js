@@ -2,7 +2,7 @@ const Auction = require("../../models/auction");
 
 exports.createAuction = (req, res, next) => {
   let auctionDate = req.body.auctionDate;
-  let auctionSession = req.body.auctionSession;
+  let auctionSession = Number(req.body.auctionSession);
   let financialYear;
   let auctionSessionCode;
   const dateofAuction = new Date(auctionDate);
