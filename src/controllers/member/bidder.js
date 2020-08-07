@@ -24,7 +24,7 @@ exports.bidderDetails = (req, res, next) => {
   Bidder.getAll((err, data) => {
     if (err)
       res.status(500).send({
-        message: "Some error occurred while retrieving Planter details.",
+        message: "Some error occurred while retrieving Bidder details.",
       });
     else res.send(data);
   });

@@ -8,8 +8,8 @@ exports.createPlanter = (req, res, next) => {
   const phoneNumber = req.body.phoneNumber;
   const address = req.body.address;
   const agencyCode = "ABC";
-  const userType = "PL";
-  const planterURN = agencyCode + userType + CodeGenerator.uniqueCode();
+  const memberType = "PL";
+  const planterURN = agencyCode + memberType + CodeGenerator.uniqueCode();
   Planter.create(
     planterURN,
     firstName,

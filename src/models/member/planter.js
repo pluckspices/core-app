@@ -17,7 +17,7 @@ Planter.create = (
   result
 ) => {
   sql.query(
-    `INSERT INTO users_planter (planter_urn, first_name, last_name, cr_no, phone_number, address) VALUES ( '${planterURN}', '${firstName}', '${lastName}', '${crNumber}', '${phoneNumber}', '${address}');`,
+    `INSERT INTO member_planter (planter_urn, first_name, last_name, cr_no, phone_number, address) VALUES ( '${planterURN}', '${firstName}', '${lastName}', '${crNumber}', '${phoneNumber}', '${address}');`,
     (err) => {
       if (err) {
         console.log("error: ", err);
@@ -37,7 +37,7 @@ Planter.getAll = (result) => {
     cr_no as crNumber,
     phone_number as phoneNumber,
     address as address
-    from users_planter`,
+    from member_planter`,
     (err, res) => {
       if (err) {
         console.log("error: ", err);
@@ -52,7 +52,7 @@ Planter.getAll = (result) => {
 
 Planter.delete = (planterURN, result) => {
   sql.query(
-    `DELETE FROM users_planter WHERE planter_urn = '${planterURN}'`,
+    `DELETE FROM member_planter WHERE planter_urn = '${planterURN}'`,
     (err, res) => {
       if (err) {
         console.log("error: ", err);
@@ -79,7 +79,7 @@ Planter.update = (
   result
 ) => {
   sql.query(
-    `UPDATE users_planter SET
+    `UPDATE member_planter SET
     first_name = '${firstName}',
     last_name = '${lastName}',
     cr_no = '${crNumber}',
@@ -96,7 +96,6 @@ Planter.update = (
         result({ kind: "NOT_FOUND" }, null);
         return;
       }
-      console.log("updated auction with id: ", planterURN);
       result(null, res);
     }
   );

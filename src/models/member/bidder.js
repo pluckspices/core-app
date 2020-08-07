@@ -7,7 +7,7 @@ const Bidder = (bidder) => {
 
 Bidder.create = (bidderName, bidderCode, result) => {
   sql.query(
-    `INSERT INTO users_bidder (bidder_name, bidder_code) VALUES ( '${bidderName}','${bidderCode}');`,
+    `INSERT INTO member_bidder (bidder_name, bidder_code) VALUES ( '${bidderName}','${bidderCode}');`,
     (err, res) => {
       if (err) {
         if (err.code == "ER_DUP_ENTRY" || err.errno == 1062) {
@@ -21,8 +21,11 @@ Bidder.create = (bidderName, bidderCode, result) => {
       if (res.affectedRows == 1) {
         result(null, { bidderCode });
         return;
+      } else {
+        console.log("error: ", err);
+        result(err, null);
+        return;
       }
-      result(null, { bidderCode });
     }
   );
 };
@@ -32,7 +35,7 @@ Bidder.getAll = (result) => {
     `SELECT bidder_name AS bidderName,
      bidder_code AS bidderCode,
      created_on AS createdOn
-    FROM users_bidder`,
+    FROM member_bidder`,
     (err, res) => {
       if (err) {
         console.log("error: ", err);
@@ -46,7 +49,7 @@ Bidder.getAll = (result) => {
 
 Bidder.delete = (bidderCode, result) => {
   sql.query(
-    `DELETE FROM users_bidder WHERE bidder_code = '${bidderCode}'`,
+    `DELETE FROM member_bidder WHERE bidder_code = '${bidderCode}'`,
     (err, res) => {
       if (err) {
         console.log("error: ", err);
