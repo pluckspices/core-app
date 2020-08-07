@@ -14,12 +14,19 @@ router.delete("/planter/:planterURN", PlanterController.deletePlanter);
 
 // Bidder
 router.post("/bidder", BidderController.createBidder);
+router.get("/bidders", BidderController.bidderDetails);
+router.delete("/bidder/:bidderCode", BidderController.deleteBidder);
 
 //Trader
-router.post("/create", TraderController.createTrader);
-// router.get("/all", planterController.findAll);
+router.post("/trader", TraderController.createTrader);
+router.get("/traders", TraderController.tradersDetails);
+router.put("/trader/:traderURN", TraderController.updateTrader);
+router.delete("/trader/:traderURN", TraderController.deleteTrader);
 
 // Dealer
-router.post("/create", DealerController.createDealer);
+router.post("/dealer", DealerController.createDealer);
+router.get("/dealers", DealerController.dealerDetails);
+router.put("/dealer/:dealerURN", DealerController.updateDealer);
+router.delete("/dealer/:dealerURN", DealerController.deleteDealer);
 
 module.exports = router;
