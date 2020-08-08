@@ -8,18 +8,20 @@ const router = express.Router();
 router.post(
   "/owned/signup",
   [
-    body("userEmail").isEmail().normalizeEmail(),
-    body("userPassword").isLength({ min: 8 }),
+    body("userEmail").exists().isEmail().normalizeEmail(),
+    body("userPassword").exists().isLength({ min: 8 }),
+    body("auctioneerUID").exists().isLength({ max: 3 }),
   ],
-  UserController.userSignUp
+  UserController.owneduserSignUp
 );
 router.post(
   "/owned/login",
   [
-    body("userEmail").isEmail().normalizeEmail(),
-    body("userPassword").isLength({ min: 8 }),
+    body("userEmail").exists().isEmail().normalizeEmail(),
+    body("userPassword").exists().isLength({ min: 8 }),
+    body("auctioneerUID").exists().isLength({ max: 3 }),
   ],
-  UserController.userLogin
+  UserController.owneduserSignUp
 );
 
 //member users(future potential) - members of client

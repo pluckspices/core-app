@@ -1,114 +1,35 @@
-const sql = require("../../middleware/db.js");
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-// constructor
-const Auction = (auction) => {
-  this.auctionNumber = auction.auctionNumber;
-  this.auctionDate = auction.auctionDate;
-};
+const AuctionSchema = new Schema({
+  auctionId: {
+    type: String,
+    required: true,
+  },
+  auctionDate: {
+    type: Date,
+    required: true,
+  },
+  sessionId: {
+    type: Number,
+    required: true,
+  },
+  statusId: {
+    type: Number,
+    default: 11,
+  },
+  createdOn: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedOn: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-Auction.create = (auctionId, auctionDate, session, status, result) => {
-  sql.query(
-    `INSERT INTO auction_holding (auction_id, auction_date, session_id, status_id) VALUES ( '${auctionId}', '${auctionDate}', '${session}', '${status}');`,
-    (err, res) => {
-      if (err) {
-        if (err.code == "ER_DUP_ENTRY" || err.errno == 1062) {
-          result({ kind: "DUP_ENTRY" }, null);
-          return;
-        }
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
-      if (res.affectedRows == 1) {
-        result(null, { auctionId });
-      }
-    }
-  );
-};
-
-Auction.findByStatusActive = (result) => {
-  sql.query(
-    `SELECT auction_id as auctionId,
-     auction_date as auctionDate,
-     session_id as sessionId,
-     status_id as statusId
-     from auction_holding where status_id not in (15)`,
-    (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
-      console.log("auctions: ", res);
-      result(null, res);
-    }
-  );
-};
-
-Auction.findByStatusClosed = (result) => {
-  sql.query(
-    `SELECT auction_id as auctionId,
-     auction_date as auctionDate,
-     session_id as sessionId,
-     status_id as statusId
-     from auction_holding where status_id = 15`,
-    (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
-      console.log("auctions: ", res);
-      result(null, res);
-    }
-  );
-};
-
-Auction.delete = (auctionId, result) => {
-  sql.query(
-    `DELETE FROM auction_holding WHERE auction_id = '${auctionId}'`,
-    (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
-      if (res.affectedRows == 0) {
-        // not found with id
-        result({ kind: "not_found" }, null);
-        return;
-      }
-      result(null, res);
-    }
-  );
-};
-
-Auction.update = (
-  auctionId,
-  auctionDate,
-  auctionSession,
-  auctionStatus,
-  result
-) => {
-  sql.query(
-    `UPDATE auction_holding SET
-    auction_date = '${auctionDate}',
-    session_id = '${auctionSession}',
-    status_id = '${auctionStatus}'
-    WHERE auction_id = '${auctionId}';`,
-    (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
-      if (res.affectedRows == 0) {
-        result({ kind: "NOT_FOUND" }, null);
-        return;
-      }
-      console.log("updated auction with id: ", auctionId);
-      result(null, res);
-    }
-  );
-};
-module.exports = Auction;
+module.exports = mongoose.model(
+  "AuctionSchema",
+  AuctionSchema,
+  "auction_holding"
+);

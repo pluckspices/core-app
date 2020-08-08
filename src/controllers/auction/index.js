@@ -1,8 +1,9 @@
 const Auction = require("../../models/auction");
 
 exports.createAuction = (req, res, next) => {
-  let auctionDate = req.body.auctionDate;
-  let auctionSession = Number(req.body.auctionSession);
+  const auctionDate = req.body.auctionDate;
+  const auctionSession = req.body.auctionSession;
+  const auctioneerUIC = req.body.auctioneerUIC;
   let financialYear;
   let auctionSessionCode;
   const dateofAuction = new Date(auctionDate);
@@ -25,103 +26,145 @@ exports.createAuction = (req, res, next) => {
   }
   switch (auctionSession) {
     case 91:
-      auctionSessionCode = "MR";
+      auctionSessionCode = "M";
       break;
     case 92:
-      auctionSessionCode = "PL";
+      auctionSessionCode = "P";
       break;
     default:
       break;
   }
-  let auctionNumber = `ABC${financialYear}${auctionSessionCode}${dayOfAuction}${monthOfAuction}`;
-  Auction.create(auctionNumber, auctionDate, auctionSession, 11, (err, data) => {
-    if (err) {
-      if (err.kind === "DUP_ENTRY") {
-        res.status(409).send({
-          message: "Auction already exists",
-          auctionId: auctionNumber,
-        });
-      } else {
-        res.status(500).send({
-          message: "Some error occurred while creating the Auction",
-        });
+  const auctionNumber = `${auctioneerUIC}${financialYear}${auctionSessionCode}${dayOfAuction}${monthOfAuction}`;
+  Auction.findOne({ auctionId: auctionNumber })
+    .then((auction) => {
+      if (auction) {
+        const error = new Error("Auction already exists.");
+        error.details = { auctionId: auction.auctionId };
+        error.statusCode = 409;
+        throw error;
       }
-    } else res.send(data);
-  });
-};
-
-exports.auctionHolding = (req, res) => {
-  Auction.findByStatusActive((err, data) => {
-    if (err)
-      res.status(500).send({
-        message: "Some error occurred while retrieving Auction.",
+      const auctionRegestration = new Auction({
+        auctionId: auctionNumber,
+        auctionDate: auctionDate,
+        sessionId: auctionSession,
       });
-    else res.send(data);
-  });
-};
-
-
-exports.auctionHistory = (req, res) => {
-  Auction.findByStatusClosed((err, data) => {
-    if (err)
-      res.status(500).send({
-        message: "Some error occurred while retrieving Auction.",
-      });
-    else res.send(data);
-  });
-};
-
-exports.deleteAuction = (req, res) => {
-  const auctionId = String(req.params.auctionId);
-  Auction.delete(auctionId, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        res.status(404).send({
-          message: "Auction Not found",
-          auctionId: auctionId,
-        });
-      } else {
-        res.status(500).send({
-          message: "Could not delete Auction",
-          auctionId: auctionId,
-        });
+      return auctionRegestration.save();
+    })
+    .then((result) => {
+      res
+        .status(201)
+        .send({ message: "Auction created!", auctionId: result.auctionId });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
       }
-    } else
-      res.send({
-        message: `Auction was deleted successfully!`,
-        auctionId: auctionId,
-      });
-  });
+      next(err);
+    });
 };
 
-exports.updateAuction = (req, res) => {
-  const auctionId = String(req.params.auctionId);
+exports.auctionHolding = (req, res, next) => {
+  Auction.find({ statusId: { $ne: 15 } })
+    .then((auctions) => {
+      if (!auctions) {
+        const error = new Error("Could not found Auction holdings!");
+        error.statusCode = 404;
+        throw error;
+      }
+      res
+        .status(200)
+        .json({ message: "Auctions fetched.", auctions: auctions });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.auctionHistory = (req, res, next) => {
+  Auction.find({ statusId: { $in: [15] } })
+    .then((auctions) => {
+      if (!auctions) {
+        const error = new Error("Could not found Auctions history!");
+        error.statusCode = 404;
+        throw error;
+      }
+      res
+        .status(200)
+        .json({ message: "Auctions fetched.", auctions: auctions });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.updateAuction = (req, res, next) => {
+  const auctionId = req.params.auctionId;
   const auctionStatus = req.body.auctionStatus;
   const auctionDate = req.body.auctionDate;
   const auctionSession = req.body.auctionSession;
-  Auction.update(
-    auctionId,
-    auctionDate,
-    auctionSession,
-    auctionStatus,
-    (err, data) => {
-      if (err) {
-        if (err.kind === "NOT_FOUND") {
-          res.status(404).send({
-            message: "Auction Not found ",
-            auctionId: auctionId,
-          });
-        } else {
-          res.status(500).send({
-            message: "Could not update Auction",
-            auctionId: auctionId,
-          });
-        }
-      } else
-        res.send({
-          message: `Auction was updated successfully!`,
-          auctionId: auctionId,
-        });
-    }
-  );
+  Auction.findOne({ auctionId: auctionId })
+    .then((auction) => {
+      if (!auction) {
+        const error = new Error("Could not found Auction!");
+        error.statusCode = 404;
+        error.details = { auctionId: auction.auctionId };
+        throw error;
+      }
+      auction.statusId = auctionStatus;
+      auction.auctionDate = auctionDate;
+      auction.sessionId = auctionSession;
+      auction.updatedOn = Date.now();
+      return auction.save();
+    })
+    .then((result) => {
+      res.status(200).json({
+        message: "Auction was updated successfully!",
+        auctionId: result.auctionId,
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.deleteAuction = (req, res, next) => {
+  const auctionId = req.params.auctionId;
+  Auction.findOne({ auctionId: auctionId })
+    .then((auction) => {
+      if (!auction) {
+        const error = new Error("Could not found Auction!");
+        error.statusCode = 404;
+        error.details = { auctionId: auction.auctionId };
+        throw error;
+      }
+      return auction.remove();
+    })
+    .then((result) => {
+      res.status(200).json({
+        message: "Auction was deleted successfully!!",
+        auctionId: result.auctionId,
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };

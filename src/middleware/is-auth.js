@@ -9,8 +9,9 @@ module.exports = (req, res, next) => {
   }
   const token = authHead.split(" ")[1];
   let decodedToken;
+  const secret = process.env.COREAPP_DB_PROVIDER;
   try {
-    decodedToken = jwt.verify(token, "nithin");
+    decodedToken = jwt.verify(token, secret);
     req.userEmail = decodedToken.userEmail;
   } catch (err) {
     console.log(err);

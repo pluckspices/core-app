@@ -2,90 +2,123 @@ const Dealer = require("../../models/member/dealer");
 const CodeGenerator = require("../../middleware/unique-code");
 
 exports.createDealer = (req, res, next) => {
-  let dealerName = req.body.dealerName;
-  let address = req.body.address;
-  let phoneNumber = req.body.phoneNumber;
-  const agencyCode = "ABC";
+  const dealerName = req.body.dealerName;
+  const address = req.body.address;
+  const phoneNumber = req.body.phoneNumber;
+  const auctioneerUIC = req.body.auctioneerUIC;
   const memberType = "DL";
-  const dealerURN = agencyCode + memberType + CodeGenerator.uniqueCode();
+  const dealerURN = auctioneerUIC + memberType + CodeGenerator.uniqueCode();
 
-  Dealer.create(dealerURN, dealerName, address, phoneNumber, (err, data) => {
-    if (err) {
-      if (err.kind === "DUP_ENTRY") {
-        res.status(409).send({
-          message: "Dealer already exists",
-          dealerURN: dealerURN,
-        });
-      } else if (!err.kind) {
-        res.status(500).send({
-          message: "Some error occurred while creating the Dealer",
-        });
+  Dealer.findOne({ dealerURN: dealerURN })
+    .then((dealer) => {
+      if (dealer) {
+        const error = new Error("Dealer already exists.");
+        error.details = { dealerURN: dealer.dealerURN };
+        error.statusCode = 409;
+        throw error;
       }
-    } else res.send(data);
-  });
+      const dealerRegestration = new Dealer({
+        dealerURN: dealerURN,
+        dealerName: dealerName,
+        address: address,
+        phoneNumber: phoneNumber,
+      });
+      return dealerRegestration.save();
+    })
+    .then((result) => {
+      res
+        .status(201)
+        .send({ message: "Dealer created!", dealerURN: result.dealerURN });
+    })
+    .catch((err) => {
+      console.log(err);
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
 
 exports.dealerDetails = (req, res, next) => {
-  Dealer.getAll((err, data) => {
-    if (err)
-      res.status(500).send({
-        message: "Some error occurred while retrieving Dealer details.",
-      });
-    else res.send(data);
-  });
+  Dealer.find()
+    .then((dealers) => {
+      if (!dealers) {
+        const error = new Error("Could not found Dealers!");
+        error.statusCode = 404;
+        throw error;
+      }
+      res.status(200).json({ message: "Dealers fetched.", dealers: dealers });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
 
 exports.updateDealer = (req, res) => {
   const dealerURN = req.params.dealerURN;
-  const ddealerName = req.body.dealerName;
+  const dealerName = req.body.dealerName;
   const phoneNumber = req.body.phoneNumber;
   const address = req.body.address;
-  Dealer.update(
-    dealerURN,
-    ddealerName,
-    phoneNumber,
-    address,
-    (err, data) => {
-      if (err) {
-        if (err.kind === "NOT_FOUND") {
-          res.status(404).send({
-            message: "Planter Not found ",
-            dealerURN: dealerURN,
-          });
-        } else {
-          res.status(500).send({
-            message: "Could not update Planter",
-            dealerURN: dealerURN,
-          });
-        }
-      } else
-        res.send({
-          message: `Planter was updated successfully!`,
-          dealerURN: dealerURN,
-        });
-    }
-  );
+  Dealer.findOne({ dealerURN: dealerURN })
+    .then((dealer) => {
+      if (!dealer) {
+        const error = new Error("Could not found Dealer!");
+        error.statusCode = 404;
+        error.details = { dealerURN: dealer.dealerURN };
+        throw error;
+      }
+      dealer.dealerName = dealerName;
+      dealer.phoneNumber = phoneNumber;
+      dealer.address = address;
+      dealer.updatedOn = Date.now();
+      return dealer.save();
+    })
+    .then((result) => {
+      res.status(200).json({
+        message: "Dealer was updated successfully!",
+        dealerURN: result.dealerURN,
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
 
 exports.deleteDealer = (req, res) => {
   const dealerURN = req.params.dealerURN;
-  Dealer.delete(dealerURN, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        res.status(404).send({
-          message: "Dealer Not found",
-          dealerURN: dealerURN,
-        });
-      } else {
-        res.status(500).send({
-          message: "Could not delete Dealer",
-          dealerURN: dealerURN,
-        });
+  
+  Dealer.findOne({ dealerURN: dealerURN })
+    .then((dealer) => {
+      if (!dealer) {
+        const error = new Error("Could not found Dealer!");
+        error.statusCode = 404;
+        error.details = { dealerURN: dealer.dealerURN };
+        throw error;
       }
-    } else
-      res.send({
-        message: `Dealer was deleted successfully!`,
-        dealerURN: dealerURN,
+      return dealer.remove();
+    })
+    .then((result) => {
+      res.status(200).json({
+        message: "Dealer was deleted successfully!!",
+        dealerURN: result.dealerURN,
       });
-  });
+    })
+    .catch((err) => {
+      console.error(err);
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
