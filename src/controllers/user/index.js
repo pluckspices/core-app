@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const OwnedUser = require("../../models/user");
 
-exports.owneduserSignUp = (req, res, next) => {
+exports.ownedUserSignUp = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error("Please check the fields!");

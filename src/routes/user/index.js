@@ -12,7 +12,7 @@ router.post(
     body("userPassword").exists().isLength({ min: 8 }),
     body("auctioneerUID").exists().isLength({ max: 3 }),
   ],
-  UserController.owneduserSignUp
+  UserController.ownedUserSignUp
 );
 router.post(
   "/owned/login",
@@ -21,7 +21,7 @@ router.post(
     body("userPassword").exists().isLength({ min: 8 }),
     body("auctioneerUID").exists().isLength({ max: 3 }),
   ],
-  UserController.owneduserSignUp
+  UserController.ownedUserLogin
 );
 
 //member users(future potential) - members of client
