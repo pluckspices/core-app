@@ -40,4 +40,4 @@ const TraderSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model("TraderSchema", TraderSchema, "member_dealer");
+module.exports = mongoose.model("TraderSchema", TraderSchema, "member_trader");
