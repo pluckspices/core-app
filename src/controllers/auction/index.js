@@ -1,8 +1,10 @@
 const Auction = require("../../models/auction");
+const LotsGenerator = require("../../middleware/lots-generator");
 
 exports.createAuction = (req, res, next) => {
   const auctionDate = req.body.auctionDate;
   const auctionSession = req.body.auctionSession;
+  const maxLots = req.body.maxLots;
   const auctioneerUIC = req.body.auctioneerUIC;
   let financialYear;
   let auctionSessionCode;
@@ -35,6 +37,8 @@ exports.createAuction = (req, res, next) => {
       break;
   }
   const auctionNumber = `${auctioneerUIC}${financialYear}${auctionSessionCode}${dayOfAuction}${monthOfAuction}`;
+  const unoccupiedLots = LotsGenerator.triggerLots(maxLots);
+
   Auction.findOne({ auctionId: auctionNumber })
     .then((auction) => {
       if (auction) {
@@ -47,6 +51,7 @@ exports.createAuction = (req, res, next) => {
         auctionId: auctionNumber,
         auctionDate: auctionDate,
         sessionId: auctionSession,
+        unoccupiedLots: unoccupiedLots,
       });
       return auctionRegestration.save();
     })
@@ -66,6 +71,28 @@ exports.createAuction = (req, res, next) => {
 
 exports.auctionHolding = (req, res, next) => {
   Auction.find({ statusId: { $ne: 15 } })
+    .then((auctions) => {
+      if (!auctions) {
+        const error = new Error("Could not found Auction holdings!");
+        error.statusCode = 404;
+        throw error;
+      }
+      res
+        .status(200)
+        .json({ message: "Auctions fetched.", auctions: auctions });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.auctionHoldingByStatus = (req, res, next) => {
+  const statusId = req.params.statusId;
+  Auction.find({ statusId: { $in: statusId } })
     .then((auctions) => {
       if (!auctions) {
         const error = new Error("Could not found Auction holdings!");

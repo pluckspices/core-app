@@ -9,6 +9,7 @@ const router = express.Router();
 //Planter
 router.post("/planter", PlanterController.createPlanter);
 router.get("/planters", PlanterController.plantersDetails);
+router.get("/planters/:searchKey", PlanterController.plantersSearch);
 router.put("/planter/:planterURN", PlanterController.updatePlanter);
 router.delete("/planter/:planterURN", PlanterController.deletePlanter);
 
@@ -26,6 +27,7 @@ router.delete("/trader/:traderURN", TraderController.deleteTrader);
 // Dealer
 router.post("/dealer", DealerController.createDealer);
 router.get("/dealers", DealerController.dealerDetails);
+router.get("/dealers/:searchKey", DealerController.dealersSearch);
 router.put("/dealer/:dealerURN", DealerController.updateDealer);
 router.delete("/dealer/:dealerURN", DealerController.deleteDealer);
 

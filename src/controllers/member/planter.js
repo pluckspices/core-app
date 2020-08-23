@@ -65,6 +65,34 @@ exports.plantersDetails = (req, res, next) => {
     });
 };
 
+exports.plantersSearch = (req, res, next) => {
+  const searchKey = req.params.searchKey;
+  Planter.find({
+    $or: [
+      { planterURN: { $regex: `.*${searchKey}.*`, $options: "ix" } },
+      { firstName: { $regex: `.*${searchKey}.*`, $options: "ix" } },
+      { lastName: { $regex: `.*${searchKey}.*`, $options: "ix" } },
+    ],
+  })
+    .then((planters) => {
+      if (!planters) {
+        const error = new Error("Could not found Planters!");
+        error.statusCode = 404;
+        throw error;
+      }
+      res
+        .status(200)
+        .json({ message: "Planters fetched.", planters: planters });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
 exports.updatePlanter = (req, res) => {
   const planterURN = req.params.planterURN;
   const firstName = req.body.firstName;
@@ -72,7 +100,7 @@ exports.updatePlanter = (req, res) => {
   const crNumber = req.body.crNumber;
   const phoneNumber = req.body.phoneNumber;
   const address = req.body.address;
-  
+
   Planter.findOne({ planterURN: planterURN })
     .then((planter) => {
       if (!planter) {
@@ -107,7 +135,7 @@ exports.updatePlanter = (req, res) => {
 
 exports.deletePlanter = (req, res) => {
   const planterURN = req.params.planterURN;
-  Dealer.findOne({ planterURN: planterURN })
+  Planter.findOne({ planterURN: planterURN })
     .then((planter) => {
       if (!planter) {
         const error = new Error("Could not found Planter!");
