@@ -18,6 +18,9 @@ const AuctionSchema = new Schema({
     type: Number,
     default: 11,
   },
+  unoccupiedLots: {
+    type: Array,
+  },
   createdOn: {
     type: Date,
     default: Date.now,
@@ -29,7 +32,7 @@ const AuctionSchema = new Schema({
 });
 
 module.exports = mongoose.model(
-  "AuctionSchema",
+  "Auction",
   AuctionSchema,
   "auction_holding"
 );

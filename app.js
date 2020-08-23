@@ -37,7 +37,7 @@ const DB_DATABASE = process.env.COREAPP_DB_DATABASE;
 mongoose
   .connect(
     `${DB_PROVIDER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_DATABASE}?retryWrites=true`,
-    { useNewUrlParser: true, useUnifiedTopology: true }
+    { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
   )
   .then((result) => {
     app.listen(PORT);

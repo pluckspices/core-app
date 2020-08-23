@@ -26,6 +26,10 @@ const PlanterSchema = new Schema({
     type: String,
     default: 11,
   },
+  membertypeId: {
+    type: Number,
+    default: 21,
+  },
   createdOn: {
     type: Date,
     default: Date.now,

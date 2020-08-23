@@ -10,6 +10,10 @@ const BidderSchema = new Schema({
     type: String,
     required: true,
   },
+  membertypeId: {
+    type: Number,
+    default: 23,
+  },
   createdOn: {
     type: Date,
     default: Date.now,

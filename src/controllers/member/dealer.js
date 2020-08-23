@@ -59,6 +59,31 @@ exports.dealerDetails = (req, res, next) => {
     });
 };
 
+exports.dealersSearch = (req, res, next) => {
+  const searchKey = req.params.searchKey;
+  Dealer.find({
+    $or: [
+      { dealerURN: { $regex: `.*${searchKey}.*`, $options: "i" } },
+      { dealerName: { $regex: `.*${searchKey}.*`, $options: "i" } },
+    ],
+  })
+    .then((dealers) => {
+      if (!dealers) {
+        const error = new Error("Could not found Dealers!");
+        error.statusCode = 404;
+        throw error;
+      }
+      res.status(200).json({ message: "Dealers fetched.", dealers: dealers });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.message = "Internal server error!";
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
 exports.updateDealer = (req, res) => {
   const dealerURN = req.params.dealerURN;
   const dealerName = req.body.dealerName;
@@ -96,7 +121,7 @@ exports.updateDealer = (req, res) => {
 
 exports.deleteDealer = (req, res) => {
   const dealerURN = req.params.dealerURN;
-  
+
   Dealer.findOne({ dealerURN: dealerURN })
     .then((dealer) => {
       if (!dealer) {

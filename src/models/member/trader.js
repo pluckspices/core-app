@@ -30,6 +30,10 @@ const TraderSchema = new Schema({
     type: String,
     default: 11,
   },
+  membertypeId: {
+    type: Number,
+    default: 22,
+  },
   createdOn: {
     type: Date,
     default: Date.now,

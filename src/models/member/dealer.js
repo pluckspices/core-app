@@ -18,6 +18,10 @@ const DealerSchema = new Schema({
     type: Number,
     default: 11,
   },
+  membertypeId: {
+    type: Number,
+    default: 22,
+  },
   createdOn: {
     type: Date,
     default: Date.now,
@@ -28,8 +32,4 @@ const DealerSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model(
-  "DealerSchema",
-  DealerSchema,
-  "member_dealer"
-);
+module.exports = mongoose.model("DealerSchema", DealerSchema, "member_dealer");
